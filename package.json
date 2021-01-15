@@ -1,0 +1,27 @@
+{
+  "name": "vue-reactive-browser-ext",
+  "version": "1.0.0",
+  "description": "A reactivity engine for browser extension shared objects",
+  "main": "lib/index.js",
+  "types": "lib",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConnectedPapers/vue-reactive-browser-ext.git"
+  },
+  "keywords": [
+    "vue"
+  ],
+  "author": "Itay KanHar <knaan.harpaz@gmail.com> (https://github.com/KanHarI)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ConnectedPapers/vue-reactive-browser-ext/issues"
+  },
+  "homepage": "https://github.com/ConnectedPapers/vue-reactive-browser-ext#readme",
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}
