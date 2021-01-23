@@ -40,8 +40,6 @@ test("RecordProxy immutables tracking", () => {
   expect(mySimpleInterface.myStr).toBe("abcd");
 });
 
-test("RecordProxy mutable tracking")
-
 // class TestSampleClass {
 //   public myStr: string;
 //   public myVal: number;
