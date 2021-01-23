@@ -13,18 +13,20 @@ interface ProxyInterface {
     name: string,
     f: (x: Record<string, unknown> | null) => void
   ): void;
-  $addPostUpdateCallbackOn(
+  $addPostUpdateCallbackOn<T>(
+    on: string | number,
     name: string,
-    f: (x: unknown | null) => void,
-    on: string | number
+    f: (x: T | null) => void
   ): void;
   $removePostUpdateCallback(name: string): void;
   $removePostUpdateCallbackOn(name: string | number, on: string): void;
-  $invalidate(): void;
+  $invalidateDown(): void;
+  $invalidateUp(): void;
   $delete(): void;
   $getProxy(): ProxyInterface;
   $getCallbacks(): Callbacks;
   $addCallbacks(callbacks: Callbacks): void;
+  $setParent(parent: ProxyInterface): void;
 }
 
 export { ProxyInterface, Callbacks };

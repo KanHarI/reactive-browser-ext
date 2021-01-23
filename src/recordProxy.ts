@@ -17,8 +17,10 @@ class RecordProxy implements ProxyInterface {
   >;
   private $reactiveChildren: Record<string, ProxyInterface>;
   private $inactiveCallbacks: Callbacks;
+  private $parent: ProxyInterface | null;
 
   constructor() {
+    this.$parent = null;
     this.$mutex = new Mutex();
     this.$internalProxyTarget = {};
     this.$reactiveChildren = {};
@@ -84,11 +86,43 @@ class RecordProxy implements ProxyInterface {
                   thisRecordProxy.$postUpdateCallbacksOn[key][callbackName]
                 );
               }
+              delete thisRecordProxy.$postUpdateCallbacksOn[key];
             }
 
             // Invalidate all callbacks recursively
-            deepCopiedProxy.$invalidate();
-            return Reflect.defineProperty(target, key, desc);
+            deepCopiedProxy.$invalidateDown();
+            const result = Reflect.defineProperty(target, key, desc);
+            thisRecordProxy.$invalidateUp();
+            return result;
+          }
+
+          // Immutable types
+          case "number":
+          case "string":
+          case "bigint":
+          case "boolean": {
+            if (key in thisRecordProxy.$reactiveChildren) {
+              const overwrittenCallbacks: Callbacks = {
+                $thisCallbacks: {},
+                $onCallbacks: {},
+              };
+              overwrittenCallbacks.$onCallbacks[
+                key
+              ] = thisRecordProxy.$reactiveChildren[key].$getCallbacks();
+              thisRecordProxy.$reactiveChildren[key].$delete();
+              delete thisRecordProxy.$reactiveChildren[key];
+              thisRecordProxy.$addCallbacks(overwrittenCallbacks);
+            }
+            if (key in thisRecordProxy.$postUpdateCallbacksOn) {
+              for (const f of Object.values(
+                thisRecordProxy.$postUpdateCallbacksOn[key]
+              )) {
+                f(desc.value);
+              }
+            }
+            const result = Reflect.defineProperty(target, key, desc);
+            thisRecordProxy.$invalidateUp();
+            return result;
           }
           default: {
             throw "Not implemented setting of type " + typeof desc.value;
@@ -166,15 +200,15 @@ class RecordProxy implements ProxyInterface {
     this.$postUpdateCallbacks[name] = f;
   }
 
-  $addPostUpdateCallbackOn(
+  $addPostUpdateCallbackOn<T>(
+    on: string | number,
     name: string,
-    f: (x: unknown) => void,
-    on: string | number
+    f: (x: T | null) => void
   ): void {
     if (!(on in this.$postUpdateCallbacksOn)) {
       this.$postUpdateCallbacksOn[on] = {};
     }
-    this.$postUpdateCallbacksOn[on][name] = f;
+    this.$postUpdateCallbacksOn[on][name] = f as (x: unknown | null) => void;
   }
 
   $removePostUpdateCallback(name: string): void {
@@ -185,9 +219,9 @@ class RecordProxy implements ProxyInterface {
     delete this.$postUpdateCallbacksOn[on][name];
   }
 
-  $invalidate(): void {
+  $invalidateDown(): void {
     for (const child of Object.values(this.$reactiveChildren)) {
-      child.$invalidate();
+      child.$invalidateDown();
     }
     for (const key of Object.keys(this.$postUpdateCallbacksOn)) {
       const value = this.$proxy[key];
@@ -197,6 +231,15 @@ class RecordProxy implements ProxyInterface {
     }
     for (const f of Object.values(this.$postUpdateCallbacks)) {
       f(this.$proxy);
+    }
+  }
+
+  $invalidateUp(): void {
+    for (const f of Object.values(this.$postUpdateCallbacks)) {
+      f(this.$proxy);
+    }
+    if (this.$parent !== null) {
+      this.$parent.$invalidateUp();
     }
   }
 
@@ -281,6 +324,10 @@ class RecordProxy implements ProxyInterface {
       }
     }
     return callbacks;
+  }
+
+  $setParent(parent: ProxyInterface): void {
+    this.$parent = parent;
   }
 }
 
