@@ -1,5 +1,6 @@
 import { RecordProxy } from "../src";
 import { deepCopyRecordToProxy } from "../src";
+import { ProxyInterface } from "../lib";
 
 test("Jest sanity", () => {
   expect(1).toBe(1);
@@ -38,4 +39,31 @@ test("RecordProxy immutables tracking", () => {
   mySimpleInterface.myStr += "d"; // Modifying myStr - should not affect myNum callbacks
   expect(JSON.stringify(myNumHistory)).toBe(JSON.stringify([2, 7, 6]));
   expect(mySimpleInterface.myStr).toBe("abcd");
+});
+
+interface NestedInterface {
+  internal: null | SimpleInterface;
+}
+
+test("RecordProxy mutable tracking", () => {
+  const myNestedInterface: NestedInterface &
+    ProxyInterface = deepCopyRecordToProxy({ internal: null });
+  let callFromParentCount = 0;
+  let callFromChildCount = 0;
+  myNestedInterface.$addPostUpdateCallbackOn(
+    "internal",
+    "callFromParent",
+    () => {
+      callFromParentCount++;
+    }
+  );
+  ((myNestedInterface.internal as unknown) as ProxyInterface).$addPostUpdateCallback(
+    "callFromChild",
+    () => {
+      callFromChildCount++;
+    }
+  );
+  myNestedInterface.internal = { myNum: 1, myStr: "a" };
+  expect(callFromParentCount).toBe(1);
+  expect(callFromChildCount).toBe(1);
 });

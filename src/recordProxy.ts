@@ -91,6 +91,8 @@ class RecordProxy implements ProxyInterface {
 
             // Invalidate all callbacks recursively
             deepCopiedProxy.$invalidateDown();
+            thisRecordProxy.$reactiveChildren[key] = deepCopiedProxy;
+            desc.value = deepCopiedProxy;
             const result = Reflect.defineProperty(target, key, desc);
             thisRecordProxy.$invalidateUp();
             return result;
@@ -205,6 +207,13 @@ class RecordProxy implements ProxyInterface {
     name: string,
     f: (x: T | null) => void
   ): void {
+    if (on in this.$reactiveChildren) {
+      this.$reactiveChildren[on].$addPostUpdateCallback(
+        name,
+        f as (x: Record<string, unknown> | null) => void
+      );
+      return;
+    }
     if (!(on in this.$postUpdateCallbacksOn)) {
       this.$postUpdateCallbacksOn[on] = {};
     }
