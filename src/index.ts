@@ -1,12 +1,12 @@
 import { RecordProxy } from "./recordProxy";
 import { ProxyInterface } from "./proxyInterface";
 import { deepCopyRecordToProxy } from "./utils/RecordUtils";
-import { addRootRecordWatcher, addRecordWatcherOn } from "./utils/watcher";
+import { addRootWatcher, addRecordWatcherOn } from "./utils/watcher";
 
 export {
   RecordProxy,
   ProxyInterface,
   deepCopyRecordToProxy,
-  addRootRecordWatcher,
+  addRootWatcher,
   addRecordWatcherOn,
 };

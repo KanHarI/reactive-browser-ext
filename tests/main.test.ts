@@ -1,7 +1,7 @@
 import { RecordProxy } from "../src";
 import { deepCopyRecordToProxy } from "../src";
 import { ProxyInterface } from "../src";
-import { addRootRecordWatcher, addRecordWatcherOn } from "../src";
+import { addRootWatcher, addRecordWatcherOn } from "../src";
 
 test("Jest sanity", () => {
   expect(1).toBe(1);
@@ -100,7 +100,7 @@ test("RecordProxy mutable tracking with watchers", () => {
   addRecordWatcherOn(myNestedInterface, "internal", "callFromParent", () => {
     callFromParentCount++;
   });
-  addRootRecordWatcher(myNestedInterface.internal, "callFromChild", () => {
+  addRootWatcher(myNestedInterface.internal, "callFromChild", () => {
     callFromChildCount++;
   });
   myNestedInterface.internal = { myNum: 1, myStr: "a" };

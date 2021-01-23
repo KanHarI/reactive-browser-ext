@@ -1,7 +1,7 @@
 import { ProxyInterface } from "../proxyInterface";
 
 // Watched is not enforced to be a ProxyInterface to allow seamless using
-function addRootRecordWatcher(
+function addRootWatcher(
   watched: Record<string, unknown> | null,
   name: string,
   f: (x: Record<string, unknown> | null) => void
@@ -23,4 +23,4 @@ function addRecordWatcherOn<T>(
   );
 }
 
-export { addRootRecordWatcher, addRecordWatcherOn };
+export { addRootWatcher, addRecordWatcherOn };
