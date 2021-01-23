@@ -1,9 +1,3 @@
-import { RecordProxy } from "../src";
-
-async function sleep(time_ms: number): Promise<void> {
-  await new Promise((r) => setTimeout(r, time_ms));
-}
-
 test("Jest sanity", () => {
   expect(1).toBe(1);
 }, 10);

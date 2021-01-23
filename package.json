@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ConnectedPapers/reactive-browser-ext.git"
+    "url": "git+https://github.com/KanHarI/reactive-browser-ext.git"
   },
   "author": "Itay KanHar <knaan.harpaz@gmail.com> (https://github.com/KanHarI)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ConnectedPapers/reactive-browser-ext/issues"
+    "url": "https://github.com/KanHarI/reactive-browser-ext/issues"
   },
-  "homepage": "https://github.com/ConnectedPapers/reactive-browser-ext#readme",
+  "homepage": "https://github.com/KanHarI/reactive-browser-ext#readme",
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.7",
     "@types/jest": "^26.0.20",
