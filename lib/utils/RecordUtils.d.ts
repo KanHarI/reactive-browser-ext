@@ -1,4 +1,4 @@
 import { RecordProxy } from "../recordProxy";
-declare function deepCopyRecordToProxy(x: Record<string, unknown>): RecordProxy & Record<string, unknown>;
+declare function deepCopyRecordToProxy<T>(x: T & Record<string, unknown>): RecordProxy & T & Record<string, unknown>;
 export { deepCopyRecordToProxy };
 //# sourceMappingURL=RecordUtils.d.ts.map

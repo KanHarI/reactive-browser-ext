@@ -1,8 +1,8 @@
 import { RecordProxy } from "../recordProxy";
 
-function deepCopyRecordToProxy(
-  x: Record<string, unknown>
-): RecordProxy & Record<string, unknown> {
+function deepCopyRecordToProxy<T>(
+  x: T & Record<string, unknown>
+): RecordProxy & T & Record<string, unknown> {
   const newObj = new RecordProxy().$getProxy();
   let isReactive = false;
   for (const key of Object.keys(x)) {
@@ -17,7 +17,7 @@ function deepCopyRecordToProxy(
   for (const key of Object.keys(x)) {
     newObj[key] = x[key];
   }
-  return (newObj as unknown) as RecordProxy & Record<string, unknown>;
+  return (newObj as unknown) as RecordProxy & T & Record<string, unknown>;
 }
 
 export { deepCopyRecordToProxy };

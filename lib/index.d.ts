@@ -1,5 +1,6 @@
 import { RecordProxy } from "./recordProxy";
 import { ProxyInterface } from "./proxyInterface";
 import { deepCopyRecordToProxy } from "./utils/RecordUtils";
-export { RecordProxy, ProxyInterface, deepCopyRecordToProxy };
+import { addRootWatcher, addWatcherOn } from "./utils/watcher";
+export { RecordProxy, ProxyInterface, deepCopyRecordToProxy, addRootWatcher, addWatcherOn, };
 //# sourceMappingURL=index.d.ts.map
