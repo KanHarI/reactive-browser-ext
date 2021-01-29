@@ -112,3 +112,35 @@ test("RecordProxy mutable tracking with watchers", () => {
   expect(callFromParentCount).toBe(1);
   expect(callFromChildCount).toBe(1);
 });
+
+test("Test array assignment", () => {
+  const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+  let element2ModCounter = 0;
+  myReactiveArray.$addPostUpdateCallbackOn("2", "strOnCallbackDetect", () => {
+    element2ModCounter++;
+  });
+  expect(element2ModCounter).toBe(0);
+  myReactiveArray.push(7);
+  myReactiveArray.push(7);
+  expect(element2ModCounter).toBe(0);
+  myReactiveArray.push(7);
+  expect(element2ModCounter).toBe(1);
+  myReactiveArray.pop();
+  expect(element2ModCounter).toBe(2);
+  myReactiveArray.pop();
+  expect(element2ModCounter).toBe(2);
+  myReactiveArray.unshift(7);
+  myReactiveArray.unshift(7);
+  expect(element2ModCounter).toBe(3);
+  myReactiveArray.shift();
+  expect(element2ModCounter).toBe(4);
+});
+
+test("Illegal array assignment", () => {
+  const throws = () => {
+    const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+    myReactiveArray["a"] = 5;
+  };
+
+  expect(throws).toThrow();
+});

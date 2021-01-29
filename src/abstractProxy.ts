@@ -10,6 +10,35 @@ interface Callbacks {
   $onCallbacks: Record<string | number, Callbacks>;
 }
 
+interface HandlerMod {
+  get?: Array<
+    [
+      (target: Record<string, unknown>, key: string) => boolean,
+      (target: Record<string, unknown>, key: string) => unknown
+    ]
+  >;
+  defineProperty?: Array<
+    [
+      (
+        target: Record<string, unknown>,
+        key: string,
+        desc: PropertyDescriptor
+      ) => boolean,
+      (
+        target: Record<string, unknown>,
+        key: string,
+        desc: PropertyDescriptor
+      ) => boolean
+    ]
+  >;
+  deleteProperty?: Array<
+    [
+      (target: Record<string, unknown>, key: string) => boolean,
+      (target: Record<string, unknown>, key: string) => boolean
+    ]
+  >;
+}
+
 class AbstractProxy {
   protected $inactiveCallbacks: Callbacks;
   protected $internalProxyTarget;
@@ -26,7 +55,10 @@ class AbstractProxy {
   protected $reactiveChildren: Record<string, AbstractProxy>;
   protected $parent: AbstractProxy | null;
 
-  constructor(target: Record<string, unknown> | Array<unknown>) {
+  constructor(
+    target: Record<string, unknown> | Array<unknown>,
+    handlerMods: Array<HandlerMod> = [{}]
+  ) {
     this.$inactiveCallbacks = { $thisCallbacks: {}, $onCallbacks: {} };
     this.$internalProxyTarget = target;
     this.$postUpdateCallbacks = {};
@@ -40,6 +72,15 @@ class AbstractProxy {
 
     const handler: ProxyHandler<Record<string, unknown>> = {
       get: function (target: Record<string, unknown>, key: string): unknown {
+        for (const handlerMod of handlerMods) {
+          if (handlerMod.get) {
+            for (const getMod of handlerMod.get) {
+              if (getMod[0](target, key)) {
+                return getMod[1](target, key);
+              }
+            }
+          }
+        }
         if (key[0] === "$") {
           // Accessing special properties of the proxy
           return Reflect.get(thisAbstractProxy, key);
@@ -57,6 +98,15 @@ class AbstractProxy {
         key: string,
         desc: PropertyDescriptor
       ): boolean {
+        for (const handlerMod of handlerMods) {
+          if (handlerMod.defineProperty) {
+            for (const getMod of handlerMod.defineProperty) {
+              if (getMod[0](target, key, desc)) {
+                return getMod[1](target, key, desc);
+              }
+            }
+          }
+        }
         if (key[0] === "$") {
           throw "Cannot set properties starting with '$' - they are special properties of the reactive state!";
         }
@@ -141,6 +191,15 @@ class AbstractProxy {
         }
       },
       deleteProperty(target: Record<string, unknown>, key: string): boolean {
+        for (const handlerMod of handlerMods) {
+          if (handlerMod.deleteProperty) {
+            for (const getMod of handlerMod.deleteProperty) {
+              if (getMod[0](target, key)) {
+                return getMod[1](target, key);
+              }
+            }
+          }
+        }
         if (key in thisAbstractProxy.$postUpdateCallbacksOn) {
           for (const callback of Object.values(
             thisAbstractProxy.$postUpdateCallbacksOn[key]
@@ -348,4 +407,4 @@ class AbstractProxy {
   }
 }
 
-export { AbstractProxy };
+export { AbstractProxy, HandlerMod };

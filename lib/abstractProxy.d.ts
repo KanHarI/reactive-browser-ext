@@ -3,6 +3,20 @@ interface Callbacks {
     $thisCallbacks: Record<string, (x: Record<string, unknown> | Array<unknown> | null) => void>;
     $onCallbacks: Record<string | number, Callbacks>;
 }
+interface HandlerMod {
+    get?: Array<[
+        (target: Record<string, unknown>, key: string) => boolean,
+        (target: Record<string, unknown>, key: string) => unknown
+    ]>;
+    defineProperty?: Array<[
+        (target: Record<string, unknown>, key: string, desc: PropertyDescriptor) => boolean,
+        (target: Record<string, unknown>, key: string, desc: PropertyDescriptor) => boolean
+    ]>;
+    deleteProperty?: Array<[
+        (target: Record<string, unknown>, key: string) => boolean,
+        (target: Record<string, unknown>, key: string) => boolean
+    ]>;
+}
 declare class AbstractProxy {
     protected $inactiveCallbacks: Callbacks;
     protected $internalProxyTarget: Record<string, unknown> | unknown[];
@@ -12,7 +26,7 @@ declare class AbstractProxy {
     protected $mutex: Mutex;
     protected $reactiveChildren: Record<string, AbstractProxy>;
     protected $parent: AbstractProxy | null;
-    constructor(target: Record<string, unknown> | Array<unknown>);
+    constructor(target: Record<string, unknown> | Array<unknown>, handlerMods?: Array<HandlerMod>);
     $addCallbacks(callbacks: Callbacks): void;
     $addPostUpdateCallback(name: string, f: (x: Record<string, unknown> | Array<unknown> | null) => void): void;
     $addPostUpdateCallbackOn<T>(on: string | number, name: string, f: (x: T | null) => void): void;
@@ -27,5 +41,5 @@ declare class AbstractProxy {
     $atomicCallback<U>(f: (x: Record<string, unknown> | Array<unknown> | null) => U): Promise<U>;
     $asyncAtomicCallback<U>(f: (x: Record<string, unknown> | Array<unknown> | null) => Promise<U>): Promise<U>;
 }
-export { AbstractProxy };
+export { AbstractProxy, HandlerMod };
 //# sourceMappingURL=abstractProxy.d.ts.map
