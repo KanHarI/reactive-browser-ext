@@ -1,11 +1,15 @@
+// Import order matters as we have circular dependency
+import { AbstractProxy, HandlerMod } from "./abstractProxy";
+import { ArrayProxy } from "./arrayProxy";
 import { RecordProxy } from "./recordProxy";
-import { ProxyInterface } from "./proxyInterface";
 import { deepCopyRecordToProxy } from "./utils/RecordUtils";
 import { addRootWatcher, addWatcherOn } from "./utils/watcher";
 
 export {
+  AbstractProxy,
+  ArrayProxy,
+  HandlerMod,
   RecordProxy,
-  ProxyInterface,
   deepCopyRecordToProxy,
   addRootWatcher,
   addWatcherOn,

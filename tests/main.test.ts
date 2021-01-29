@@ -1,7 +1,10 @@
-import { RecordProxy } from "../src";
-import { deepCopyRecordToProxy } from "../src";
-import { ProxyInterface } from "../src";
-import { addRootWatcher, addWatcherOn } from "../src";
+import {
+  AbstractProxy,
+  addRootWatcher,
+  addWatcherOn,
+  deepCopyRecordToProxy,
+  RecordProxy,
+} from "../src";
 
 test("Jest sanity", () => {
   expect(1).toBe(1);
@@ -65,12 +68,14 @@ test("RecordProxy immutables tracking with watcher", () => {
 });
 
 interface NestedInterface extends Record<string, unknown> {
-  internal: null | SimpleInterface;
+  internal: SimpleInterface;
 }
 
 test("RecordProxy mutable tracking", () => {
   const myNestedInterface: NestedInterface &
-    ProxyInterface = deepCopyRecordToProxy({ internal: null });
+    AbstractProxy = deepCopyRecordToProxy({
+    internal: { myNum: 0, myStr: "" },
+  });
   let callFromParentCount = 0;
   let callFromChildCount = 0;
   myNestedInterface.$addPostUpdateCallbackOn(
@@ -80,7 +85,7 @@ test("RecordProxy mutable tracking", () => {
       callFromParentCount++;
     }
   );
-  ((myNestedInterface.internal as unknown) as ProxyInterface).$addPostUpdateCallback(
+  ((myNestedInterface.internal as unknown) as AbstractProxy).$addPostUpdateCallback(
     "callFromChild",
     () => {
       callFromChildCount++;
@@ -93,7 +98,7 @@ test("RecordProxy mutable tracking", () => {
 
 test("RecordProxy mutable tracking with watchers", () => {
   const myNestedInterface = deepCopyRecordToProxy<NestedInterface>({
-    internal: null,
+    internal: { myNum: 0, myStr: "" },
   });
   let callFromParentCount = 0;
   let callFromChildCount = 0;
@@ -106,4 +111,36 @@ test("RecordProxy mutable tracking with watchers", () => {
   myNestedInterface.internal = { myNum: 1, myStr: "a" };
   expect(callFromParentCount).toBe(1);
   expect(callFromChildCount).toBe(1);
+});
+
+test("Test array assignment", () => {
+  const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+  let element2ModCounter = 0;
+  myReactiveArray.$addPostUpdateCallbackOn("2", "strOnCallbackDetect", () => {
+    element2ModCounter++;
+  });
+  expect(element2ModCounter).toBe(0);
+  myReactiveArray.push(7);
+  myReactiveArray.push(7);
+  expect(element2ModCounter).toBe(0);
+  myReactiveArray.push(7);
+  expect(element2ModCounter).toBe(1);
+  myReactiveArray.pop();
+  expect(element2ModCounter).toBe(2);
+  myReactiveArray.pop();
+  expect(element2ModCounter).toBe(2);
+  myReactiveArray.unshift(7);
+  myReactiveArray.unshift(7);
+  expect(element2ModCounter).toBe(3);
+  myReactiveArray.shift();
+  expect(element2ModCounter).toBe(4);
+});
+
+test("Illegal array assignment", () => {
+  const throws = () => {
+    const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+    myReactiveArray["a"] = 5;
+  };
+
+  expect(throws).toThrow();
 });
