@@ -1,4 +1,9 @@
-import { AbstractProxy, HandlerMod } from ".";
+import {
+  AbstractProxy,
+  DeepCopyToReactiveCallback,
+  deepCopyToReactiveProxy,
+  HandlerMod,
+} from ".";
 
 function verifyArrayIndex(
   target: Record<string, unknown>,
@@ -17,14 +22,20 @@ function verifyArrayIndex(
 }
 
 class ArrayProxy extends AbstractProxy {
-  constructor() {
-    const newEmptyArr: Array<unknown> = [];
-    const arrayHandlerMod: HandlerMod = {
-      get: [[verifyArrayIndex, verifyArrayIndex]],
-      defineProperty: [[verifyArrayIndex, verifyArrayIndex]],
-      deleteProperty: [[verifyArrayIndex, verifyArrayIndex]],
-    };
-    super(newEmptyArr, [arrayHandlerMod]);
+  constructor(
+    target: Array<unknown> = [],
+    handlerMods: Array<HandlerMod> = [],
+    deepCopyCallback: DeepCopyToReactiveCallback = deepCopyToReactiveProxy
+  ) {
+    // Immutable push
+    handlerMods = handlerMods.concat([
+      {
+        get: [[verifyArrayIndex, verifyArrayIndex]],
+        defineProperty: [[verifyArrayIndex, verifyArrayIndex]],
+        deleteProperty: [[verifyArrayIndex, verifyArrayIndex]],
+      },
+    ]);
+    super(target, handlerMods, deepCopyCallback);
   }
 }
 

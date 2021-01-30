@@ -1,1 +1,1 @@
-{"version":3,"file":"arrayProxy.d.ts","sourceRoot":"","sources":["../src/arrayProxy.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAc,MAAM,GAAG,CAAC;AAkB9C,cAAM,UAAW,SAAQ,aAAa;;CAUrC;AAED,OAAO,EAAE,UAAU,EAAE,CAAC"}
+{"version":3,"file":"arrayProxy.d.ts","sourceRoot":"","sources":["../src/arrayProxy.ts"],"names":[],"mappings":"AAAA,OAAO,EACL,aAAa,EACb,0BAA0B,EAE1B,UAAU,EACX,MAAM,GAAG,CAAC;AAkBX,cAAM,UAAW,SAAQ,aAAa;gBAElC,MAAM,GAAE,KAAK,CAAC,OAAO,CAAM,EAC3B,WAAW,GAAE,KAAK,CAAC,UAAU,CAAM,EACnC,gBAAgB,GAAE,0BAAoD;CAYzE;AAED,OAAO,EAAE,UAAU,EAAE,CAAC"}
