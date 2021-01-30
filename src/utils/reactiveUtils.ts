@@ -1,8 +1,10 @@
-import { AbstractProxy } from "..";
-import { RecordProxy } from "..";
-import { ArrayProxy } from "..";
+import { AbstractProxy, ArrayProxy, RecordProxy } from "..";
 
-function deepCopyRecordToProxy<T>(
+type DeepCopyToReactiveCallback = <T>(
+  x: T & (Record<string, unknown> | Array<unknown>)
+) => AbstractProxy & T & Record<string, unknown>;
+
+function deepCopyToReactiveProxy<T>(
   x: T & (Record<string, unknown> | Array<unknown>)
 ): AbstractProxy & T & Record<string, unknown> {
   let newObj: Record<string, unknown> | null = null;
@@ -30,4 +32,4 @@ function deepCopyRecordToProxy<T>(
   return (newObj as unknown) as AbstractProxy & T & Record<string, unknown>;
 }
 
-export { deepCopyRecordToProxy };
+export { deepCopyToReactiveProxy, DeepCopyToReactiveCallback };

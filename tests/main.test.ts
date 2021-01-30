@@ -2,7 +2,7 @@ import {
   AbstractProxy,
   addRootWatcher,
   addWatcherOn,
-  deepCopyRecordToProxy,
+  deepCopyToReactiveProxy,
   RecordProxy,
 } from "../src";
 
@@ -26,7 +26,7 @@ interface SimpleInterface extends Record<string, unknown> {
 
 test("RecordProxy immutables tracking", () => {
   const mySimpleInterface: RecordProxy &
-    SimpleInterface = deepCopyRecordToProxy<SimpleInterface>({
+    SimpleInterface = deepCopyToReactiveProxy<SimpleInterface>({
     myNum: 2,
     myStr: "abc",
   });
@@ -47,7 +47,7 @@ test("RecordProxy immutables tracking", () => {
 
 test("RecordProxy immutables tracking with watcher", () => {
   const mySimpleInterface: RecordProxy &
-    SimpleInterface = deepCopyRecordToProxy<SimpleInterface>({
+    SimpleInterface = deepCopyToReactiveProxy<SimpleInterface>({
     myNum: 2,
     myStr: "abc",
   });
@@ -73,7 +73,7 @@ interface NestedInterface extends Record<string, unknown> {
 
 test("RecordProxy mutable tracking", () => {
   const myNestedInterface: NestedInterface &
-    AbstractProxy = deepCopyRecordToProxy({
+    AbstractProxy = deepCopyToReactiveProxy({
     internal: { myNum: 0, myStr: "" },
   });
   let callFromParentCount = 0;
@@ -97,7 +97,7 @@ test("RecordProxy mutable tracking", () => {
 });
 
 test("RecordProxy mutable tracking with watchers", () => {
-  const myNestedInterface = deepCopyRecordToProxy<NestedInterface>({
+  const myNestedInterface = deepCopyToReactiveProxy<NestedInterface>({
     internal: { myNum: 0, myStr: "" },
   });
   let callFromParentCount = 0;
@@ -114,7 +114,7 @@ test("RecordProxy mutable tracking with watchers", () => {
 });
 
 test("Test array assignment", () => {
-  const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+  const myReactiveArray = deepCopyToReactiveProxy<Array<unknown>>([]);
   let element2ModCounter = 0;
   myReactiveArray.$addPostUpdateCallbackOn("2", "strOnCallbackDetect", () => {
     element2ModCounter++;
@@ -138,7 +138,7 @@ test("Test array assignment", () => {
 
 test("Illegal array assignment", () => {
   const throws = () => {
-    const myReactiveArray = deepCopyRecordToProxy<Array<unknown>>([]);
+    const myReactiveArray = deepCopyToReactiveProxy<Array<unknown>>([]);
     myReactiveArray["a"] = 5;
   };
 

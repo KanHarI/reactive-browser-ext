@@ -1,4 +1,5 @@
 import { Mutex } from "async-mutex";
+import { DeepCopyToReactiveCallback } from ".";
 interface Callbacks {
     $thisCallbacks: Record<string, (x: Record<string, unknown> | Array<unknown> | null) => void>;
     $onCallbacks: Record<string | number, Callbacks>;
@@ -26,7 +27,7 @@ declare class AbstractProxy {
     protected $mutex: Mutex;
     protected $reactiveChildren: Record<string, AbstractProxy>;
     protected $parent: AbstractProxy | null;
-    constructor(target: Record<string, unknown> | Array<unknown>, handlerMods?: Array<HandlerMod>);
+    constructor(target: Record<string, unknown> | Array<unknown>, handlerMods?: Array<HandlerMod>, deepCopyToReactive?: DeepCopyToReactiveCallback);
     $addCallbacks(callbacks: Callbacks): void;
     $addPostUpdateCallback(name: string, f: (x: Record<string, unknown> | Array<unknown> | null) => void): void;
     $addPostUpdateCallbackOn<T>(on: string | number, name: string, f: (x: T | null) => void): void;

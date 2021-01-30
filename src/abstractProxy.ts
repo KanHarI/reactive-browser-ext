@@ -1,6 +1,6 @@
 import { Mutex } from "async-mutex";
 
-import { deepCopyRecordToProxy } from ".";
+import { DeepCopyToReactiveCallback, deepCopyToReactiveProxy } from ".";
 
 interface Callbacks {
   $thisCallbacks: Record<
@@ -57,7 +57,8 @@ class AbstractProxy {
 
   constructor(
     target: Record<string, unknown> | Array<unknown>,
-    handlerMods: Array<HandlerMod> = [{}]
+    handlerMods: Array<HandlerMod> = [{}],
+    deepCopyToReactive: DeepCopyToReactiveCallback = deepCopyToReactiveProxy
   ) {
     this.$inactiveCallbacks = { $thisCallbacks: {}, $onCallbacks: {} };
     this.$internalProxyTarget = target;
@@ -115,7 +116,7 @@ class AbstractProxy {
         switch (typeof desc.value) {
           case "object": {
             // Ignore the null case for now
-            const deepCopiedProxy: AbstractProxy = deepCopyRecordToProxy(
+            const deepCopiedProxy: AbstractProxy = deepCopyToReactive(
               desc.value !== null ? (desc.value as Record<string, unknown>) : {}
             );
 
